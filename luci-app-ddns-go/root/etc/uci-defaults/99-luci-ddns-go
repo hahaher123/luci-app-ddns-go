@@ -1,0 +1,12 @@
+#!/bin/sh
+
+chmod +x /usr/share/rpcd/ucode/luci.ddns-go
+chown root:www-data /usr/libexec/ddns-go-call
+chmod 750 /usr/libexec/ddns-go-call
+rm -f /tmp/luci-indexcache
+/etc/init.d/rpcd restart
+exit 0
+# nginx 布局下让新增的 /ddns-go/ 反代 locations 生效
+if [ -x /etc/init.d/nginx ]; then
+	/etc/init.d/nginx restart 2>/dev/null || true
+fi

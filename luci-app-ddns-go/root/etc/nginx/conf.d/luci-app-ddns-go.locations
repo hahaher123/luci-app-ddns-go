@@ -1,0 +1,8 @@
+# luci-app-ddns-go: nginx UCI 布局下的同源反代
+# (uhttpd 系统不读取本文件, 留着无害; LuCI 内嵌页 iframe 用相对路径 /ddns-go/,
+#  http/https 自动继承页面协议, 避免 https 环境混合内容被浏览器拦截)
+location /ddns-go/ {
+	proxy_pass http://127.0.0.1:9876/;
+	proxy_redirect / /ddns-go/;
+	proxy_set_header Host $host;
+}

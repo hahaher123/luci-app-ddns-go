@@ -1,0 +1,49 @@
+name: Build Packages
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - v*
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build packages
+        uses: sirpdboy/gh-action-sdk@go1.26
+        env:
+          ARCH: x86_64-SNAPSHOT
+          FEEDNAME: packages_ci
+          PACKAGES: luci-app-ddns-go
+          NO_REFRESH_CHECK: true
+
+      - name: Collect apks
+        run: |
+          SRC=bin/packages/x86_64/packages_ci
+          [ -d "$SRC" ] || SRC=bin/packages/riscv64_generic/packages_ci
+          mkdir -p out
+          cp "$SRC"/*.apk out/
+          tar -zcvf SNAPSHOT-noarch.tar.gz -C out .
+          ls -la out/
+
+      - name: Upload to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: ncipollo/release-action@v1
+        with:
+          name: luci-app-ddns-go ${{ github.ref_name }}
+          tag: ${{ github.ref_name }}
+          allowUpdates: true
+          replacesArtifacts: true
+          artifacts: "SNAPSHOT-noarch.tar.gz"
+          body: |
+            luci-app-ddns-go noarch apk（含 luci-i18n-ddns-go-zh-cn，与架构无关）。
+
+            - SNAPSHOT = 25.12 SDK（apk-tools 3）
+            - ddns-go 内核请配合 [openwrt-ddns-go](https://github.com/hahaher123/openwrt-ddns-go) 使用
+            - 基于 [sirpdboy/luci-app-ddns-go](https://github.com/sirpdboy/luci-app-ddns-go) 的自用修改，改动见 README
