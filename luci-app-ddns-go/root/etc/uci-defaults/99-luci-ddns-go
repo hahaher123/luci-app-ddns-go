@@ -5,8 +5,10 @@ chown root:www-data /usr/libexec/ddns-go-call
 chmod 750 /usr/libexec/ddns-go-call
 rm -f /tmp/luci-indexcache
 /etc/init.d/rpcd restart
-exit 0
-# nginx 布局下让新增的 /ddns-go/ 反代 locations 生效
+# nginx 布局下让新增的 /ddns-go/ 反代 locations 生效。
+# 必须放在脚本末尾（exit 之前）：uci-defaults 由 boot 以 `( . "$file" )` 执行，
+# 靠返回值决定是否删除该脚本；写在 exit 之后的语句永远不会执行。
 if [ -x /etc/init.d/nginx ]; then
-	/etc/init.d/nginx restart 2>/dev/null || true
+	/etc/init.d/nginx restart >/dev/null 2>&1 || true
 fi
+exit 0

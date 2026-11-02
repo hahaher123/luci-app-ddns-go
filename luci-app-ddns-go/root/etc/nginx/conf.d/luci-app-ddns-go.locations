@@ -2,7 +2,21 @@
 # (uhttpd 系统不读取本文件, 留着无害; LuCI 内嵌页 iframe 用相对路径 /ddns-go/,
 #  http/https 自动继承页面协议, 避免 https 环境混合内容被浏览器拦截)
 location /ddns-go/ {
+	# 只对内网开放。反代后 ddns-go 看到的客户端地址恒为 127.0.0.1,
+	# 它自带的「禁止公网访问」(NotAllowWanAccess) 因此对经反代的请求永不触发,
+	# 这一层的 allow/deny 就是那道闸的替代品 —— 删掉即等于把面板暴露到公网。
+	allow 127.0.0.1;
+	allow ::1;
+	allow 10.0.0.0/8;
+	allow 172.16.0.0/12;
+	allow 192.168.0.0/16;
+	allow fd00::/8;
+	allow fe80::/10;
+	deny all;
+
 	proxy_pass http://127.0.0.1:9876/;
 	proxy_redirect / /ddns-go/;
 	proxy_set_header Host $host;
+	# ddns-go 不读 X-Real-IP, 这里只为 nginx 侧排障留痕
+	proxy_set_header X-Real-IP $remote_addr;
 }
