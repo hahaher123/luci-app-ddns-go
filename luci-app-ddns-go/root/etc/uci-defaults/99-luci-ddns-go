@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 chmod +x /usr/share/rpcd/ucode/luci.ddns-go
 chown root:www-data /usr/libexec/ddns-go-call

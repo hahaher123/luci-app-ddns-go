@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 case "$1" in
     "get_logs")
         logread -l 200 2>/dev/null | grep ddns-go || echo "No ddns-go logs found"

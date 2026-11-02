@@ -14,7 +14,7 @@ PKG_MAINTAINER:=sirpdboy  <herboy2008@gmail.com>
 PKG_CONFIG_DEPENDS:=
 
 LUCI_TITLE:=LuCI Support for Dynamic ddns-go Client
-LUCI_DEPENDS:=+ddns-go
+LUCI_DEPENDS:=+ddns-go +bash
 LUCI_PKGARCH:=all
 
 
